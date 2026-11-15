@@ -1,0 +1,29 @@
+{
+  "ocean_wave_1": {
+    "sounds": [
+      {
+        "name": "wavify:ocean_wave_1",
+        "stream": true
+      }
+    ],
+    "category": "ambient"
+  },
+  "ocean_wave_2": {
+    "sounds": [
+      {
+        "name": "wavify:ocean_wave_2",
+        "stream": true
+      }
+    ],
+    "category": "ambient"
+  },
+  "river_wave": {
+    "sounds": [
+      {
+        "name": "wavify:river_wave",
+        "stream": true
+      }
+    ],
+    "category": "ambient"
+  }
+}

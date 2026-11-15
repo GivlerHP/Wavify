@@ -1,0 +1,17 @@
+[
+  {
+    "modid": "wavify",
+    "name": "Wavify",
+    "description": "Ocean and river waves, foam, shoreline spray and ambience. Minecraft 1.7.10 backport by Givler. Original Wavify by Superkat32; Forge source port by Icywhenhot.",
+    "version": "${version}",
+    "mcversion": "1.7.10",
+    "url": "https://github.com/Icywhenhot/Tidal",
+    "authorList": [
+      "Givler (1.7.10 backport)",
+      "Superkat32 (original)",
+      "Icywhenhot (Forge source port)"
+    ],
+    "credits": "Original code, textures and sounds: Superkat32. MIT License.",
+    "logoFile": "assets/wavify/icon.png"
+  }
+]

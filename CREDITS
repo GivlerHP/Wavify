@@ -1,0 +1,8 @@
+Wavify for Minecraft 1.7.10
+Backport author: Givler
+Original Wavify / Tidal author: Superkat32
+Forge 1.20.1 source port: Icywhenhot/Tidal, branch 1.20.1-forge
+Upstream revision: 7609c0d538f8df7ed1680572fa08496f0849e9c6
+https://github.com/Icywhenhot/Tidal/tree/1.20.1-forge
+https://github.com/Superkat32/Wavify
+Original algorithms, textures and sounds retained under the MIT License.
