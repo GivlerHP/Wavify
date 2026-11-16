@@ -4,7 +4,8 @@ import net.minecraftforge.common.config.Configuration;
 public final class WavifyConfig {
  public static boolean enabled=true,enableOceanWaves=true,enableRiverWaves=true,enableWetOverlay=true,enableWaveSounds=true,applyTransparencyToFoam=false,particles=true;
  public static int chunkRadius=5,spawnDistance=8,maxWaves=96,scanColumnsPerTick=64,chunkUpdatesRescanAmount=50,riverWaveSpawnRadius=56,riverWaveTravelBlocks=11,customColor=0x3F76E4;
- public static double transparency=1,shaderWaveYSink=-.30,waveYOffset=0,riverWaveDensity=4,waveSoundVolume=1;
+ public static double transparency=1,shaderWaveYSink=-.30,waveYOffset=0,riverWaveDensity=1.5,waveSoundVolume=1,riverWaveScale=.55,shoreWaveScale=1.2,rainWaveScale=1.35;
+ public static int riverWaveSpawnInterval=80,shoreWaveCount=3,shoreWaveGap=52;
  public static String colorSource="BIOME";
  public static final java.util.Map<Integer,Integer> biomeColors=new java.util.HashMap<Integer,Integer>();
  private WavifyConfig(){}
@@ -24,7 +25,13 @@ public final class WavifyConfig {
  riverWaveSpawnRadius=c.getInt("riverWaveSpawnRadius","waves",56,16,128,"River wave radius.");
  riverWaveTravelBlocks=c.getInt("riverWaveTravelBlocks","waves",11,4,32,"River wave travel distance.");
  transparency=c.getFloat("transparency","appearance",1,0,1,"Wave body opacity.");
- riverWaveDensity=c.getFloat("riverWaveDensity","waves",4,0,20,"River waves per 100 surface water blocks.");
+ riverWaveDensity=c.getFloat("riverWaveDensity","waves",1.5f,0,20,"River waves per 100 surface water blocks; replenished gradually.");
+ riverWaveScale=c.getFloat("riverWaveScale","waves",.55f,.25f,1.5f,"River ripple size multiplier, independent of coastal surf.");
+ riverWaveSpawnInterval=c.getInt("riverWaveSpawnInterval","waves",80,20,400,"Ticks between river spawn attempts; at most two new ripples per attempt.");
+ shoreWaveScale=c.getFloat("shoreWaveScale","waves",1.2f,.5f,2f,"Coastal wave size multiplier.");
+ shoreWaveCount=c.getInt("shoreWaveCount","waves",3,1,5,"Maximum crests per coastal set: usually one, sometimes two, rarely more. All count towards maxWaves.");
+ shoreWaveGap=c.getInt("shoreWaveGap","waves",52,12,120,"Minimum ticks between coastal crests; each set adds 0-20 ticks of variation.");
+ rainWaveScale=c.getFloat("rainWaveScale","waves",1.35f,1f,2f,"Coastal size multiplier at full rain strength; fades smoothly with the weather.");
  waveSoundVolume=c.getFloat("volume","sounds",1,0,1,"Ambient wave volume.");
  waveYOffset=c.getFloat("waveYOffset","appearance",0,-.5f,.5f,"Wave height adjustment.");
  shaderWaveYSink=c.getFloat("shaderWaveYSink","appearance",-.30f,-.5f,.5f,"Additional body offset only while a shader pack is actively enabled.");

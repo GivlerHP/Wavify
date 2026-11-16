@@ -2,6 +2,7 @@
 package net.superkat.wavify.wave;
 
 import net.superkat.wavify.compat.*;
+import net.superkat.wavify.config.WavifyConfig;
 
 import net.superkat.wavify.river.RiverFlow;
 import net.superkat.wavify.river.RiverFlowField;
@@ -46,10 +47,11 @@ public class RiverWave extends Wave {
 
         float sizeJitter = 0.82f + world.getRandom().nextFloat() * 0.36f;
         this.scale = Math.max(1.7f, (1.55f + this.width * 0.24f) * sizeJitter);
+        this.scale *= (float)WavifyConfig.riverWaveScale;
         this.length = Math.max(1.05f, (1.0f + this.width * 0.11f) * sizeJitter);
         this.baseScale = this.scale;
         this.baseLength = this.length;
-        this.maxAlpha = 0.78f;
+        this.maxAlpha = 0.60f;
         this.motionPhase = world.getRandom().nextFloat() * 24f;
 
         this.curvatureFactor = 0.65f + world.getRandom().nextFloat() * 0.95f;
@@ -183,7 +185,7 @@ public class RiverWave extends Wave {
         float pulse = Mth.sin((this.age + this.motionPhase) * 0.18f);
         float crest = Math.abs(pulse);
         this.pitch = pulse * 2.4f;
-        this.scale = this.baseScale + crest * 0.05f;
+        this.scale = this.baseScale + crest * 0.05f * (float)WavifyConfig.riverWaveScale;
         this.length = this.baseLength + crest * 0.08f;
 
         if (this.fading) {

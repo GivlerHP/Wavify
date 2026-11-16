@@ -3,6 +3,8 @@ import java.util.*;
 import net.superkat.wavify.compat.*;
 import net.superkat.wavify.scan.*;
 import net.superkat.wavify.river.*;
+import net.superkat.wavify.wave.ShoreWaveSchedule;
+import net.superkat.wavify.wave.ShoreWave;
 public final class BackportChecks {
  private static int checks;
  private static void check(boolean ok,String label){checks++;if(!ok)throw new AssertionError(label);}
@@ -32,6 +34,7 @@ public final class BackportChecks {
  check(fronts.size()<contour.size()&&fronts.size()>0,"adjacent coast cells form grouped fronts");
  check(fronts.size()>=(contour.size()+2)/3,"front group has at most three cells");
  for(ShoreScanner.Front front:fronts){check(front.width>=1&&front.width<=3,"original front width bounds");check(Math.abs(Math.abs(front.yaw)-180)<1,"coherent front direction");}
+ shoreSets(fronts);
  Map<Long,SurfaceSnapshot> beachChunks=new HashMap<Long,SurfaceSnapshot>();
  for(SurfaceSnapshot snap:chunks.values()){
  byte[] flags=snap.flags.clone();for(int z=1;z<=16;z++)for(int x=1;x<=16;x++){int wx=snap.chunkX*16+x-1;if(wx>=0&&wx<12)flags[z*18+x]=(byte)(flags[z*18+x]&~2);}
@@ -69,5 +72,31 @@ public final class BackportChecks {
  }catch(java.io.IOException e){throw new AssertionError(e);}
  check(!ShaderState.active(),"optional shader classes absent");
  System.out.println("Wavify backport checks passed: "+checks);
+ }
+ private static void shoreSets(List<ShoreScanner.Front> fronts){
+ Random random=new Random(90210);int[] counts=new int[4];
+ for(int i=0;i<10000;i++)counts[ShoreWaveSchedule.chooseCount(random,3)]++;
+ check(counts[1]>6500&&counts[1]<7500&&counts[2]>2000&&counts[3]>250,"single waves dominate; pairs and triples remain occasional");
+ for(int i=0;i<100;i++)check(ShoreWaveSchedule.chooseCount(random,1)==1&&ShoreWaveSchedule.chooseCount(random,2)<=2,"configured maximum bounds random sets");
+ check(ShoreWave.rainMultiplier(0,1.35f)==1f,"dry weather preserves calm surf");
+ check(Math.abs(ShoreWave.rainMultiplier(1,1.35f)-1.35f)<.0001f,"full rain grows coastal waves");
+ check(ShoreWave.rainMultiplier(.5f,1.35f)>1f&&ShoreWave.rainMultiplier(.5f,1.35f)<1.35f,"rain transition changes size gradually");
+ check(ShoreWave.rainMultiplier(-1,1.35f)==1f&&ShoreWave.rainMultiplier(2,1.35f)==1.35f,"weather strength is clamped");
+ ShoreWaveSchedule schedule=new ShoreWaveSchedule();List<ShoreScanner.Front> coast=fronts.subList(0,2);
+ schedule.addSets(coast,100,3,28,7);check(schedule.size()==6,"reserve complete three-crest sets within total wave cap");
+ schedule.addSets(coast,100,3,28,7);check(schedule.size()==6,"existing reservations prevent river/shore oversubscription");
+ check(schedule.poll(99)==null,"no early surf crest");
+ Map<ShoreScanner.Front,List<Long>> births=new HashMap<ShoreScanner.Front,List<Long>>();
+ for(long tick:new long[]{100,128,156}){
+ for(int i=0;i<2;i++){ShoreWaveSchedule.Crest crest=schedule.poll(tick);check(crest!=null&&crest.birthTick==tick,"coherent fronts in each successive crest");
+ List<Long> times=births.get(crest.front);if(times==null){times=new ArrayList<Long>();births.put(crest.front,times);}times.add(crest.birthTick);}
+ check(schedule.poll(tick+27)==null,"surf gap separates consecutive crests");
+ }
+ check(schedule.size()==0&&births.size()==2,"all selected coastline fronts receive their full set");
+ for(List<Long> times:births.values())check(times.equals(Arrays.asList(100L,128L,156L)),"same coastline receives three spaced waves");
+ schedule.addSets(coast,200,3,28,2);check(schedule.size()==0,"insufficient capacity cannot create an isolated first wave");
+ schedule.addSets(coast,200,3,28,6);schedule.poll(200);schedule.clear();
+ check(schedule.size()==0&&schedule.poll(Long.MAX_VALUE)==null,"world reset/disable cancels delayed crests");
+ schedule.addSets(coast,300,1,28,2);check(schedule.size()==2,"single-crest configuration remains supported");
  }
 }
