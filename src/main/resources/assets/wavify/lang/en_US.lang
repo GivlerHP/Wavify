@@ -1,1 +1,8 @@
 wavify.name=Wavify
+wavify.options.enabled=Enable Waves
+wavify.options.enabled.tooltip=Enables Wavify waves. Disabling stops water scanning, wave simulation, particles and sounds.
+wavify.options.mode=Waves
+wavify.options.mode.tooltip=Choose where waves appear. Changing the mode restarts the handler and clears old waves and sounds.
+wavify.options.mode.seas=Seas Only
+wavify.options.mode.rivers=Rivers Only
+wavify.options.mode.both=Seas and Rivers

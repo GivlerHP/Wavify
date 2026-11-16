@@ -7,7 +7,6 @@ import net.minecraft.util.Vec3;
 
 import com.google.common.collect.Sets;
 
-
 import java.util.Set;
 
 public class Wave {
@@ -103,7 +102,8 @@ public class Wave {
 
     public Set<BlockPos> getCoveredBlocks() {
         Set<BlockPos> set = Sets.newHashSet();
-        if (!this.isWashingUp()) return set;
+        if (!this.isWashingUp())
+            return set;
         BlockPos currentPos = this.getBlockPos();
 
         int extra = 0;
@@ -111,8 +111,10 @@ public class Wave {
             extra = this.getWashingAge() <= 40 ? 3 : 1;
         }
         int usedWidth = (int) (this.width - (this.bigWave ? 0 : 1)) + extra;
-        for (BlockPos pos : BlockPos.betweenClosed(currentPos.offset(-usedWidth, -1, -usedWidth), currentPos.offset(usedWidth, -1, usedWidth))) {
-            if (WavifyWaveHandler.posIsWater(this.level, pos) || this.level.isEmptyBlock(pos)) continue;
+        for (BlockPos pos : BlockPos.betweenClosed(currentPos.offset(-usedWidth, -1, -usedWidth),
+                currentPos.offset(usedWidth, -1, usedWidth))) {
+            if (WavifyWaveHandler.posIsWater(this.level, pos) || this.level.isEmptyBlock(pos))
+                continue;
             set.add(new BlockPos(pos));
         }
         return set;
@@ -137,7 +139,7 @@ public class Wave {
                 this.velZ *= 0.9f;
             }
 
-            float addedLength = (float)Math.hypot(velX, velZ) * (this.bigWave ? 1 : 0.75f);
+            float addedLength = (float) Math.hypot(velX, velZ) * (this.bigWave ? 1 : 0.75f);
             this.length += addedLength;
             if (this.getWashingAge() >= maxWashingAge) {
                 this.markDead();
@@ -147,10 +149,12 @@ public class Wave {
             if (drowningAway) {
                 this.length -= 0.1f;
                 this.velY -= 0.005f;
-                if (this.length <= 0f) this.markDead();
+                if (this.length <= 0f)
+                    this.markDead();
             }
 
-            if (this.alpha < 1f) this.alpha += 0.05f;
+            if (this.alpha < 1f)
+                this.alpha += 0.05f;
         }
 
         if (this.hitBlock && this.age - this.hitBlockAge >= 2) {
@@ -165,7 +169,8 @@ public class Wave {
         float initVelX = velX;
         float initVelY = velY;
         float initVelZ = velZ;
-        if ((velX != 0.0 || velY != 0.0 || velZ != 0.0) && velX * velX + velY * velY + velZ * velZ < MAX_SQUARED_COLLISION_CHECK_DISTANCE) {
+        if ((velX != 0.0 || velY != 0.0 || velZ != 0.0)
+                && velX * velX + velY * velY + velZ * velZ < MAX_SQUARED_COLLISION_CHECK_DISTANCE) {
             Vec3 vec3d = this.level.collide(this.getHitBox(), velX, velY, velZ);
             velX = (float) vec3d.xCoord;
             velY = (float) vec3d.yCoord;
@@ -188,14 +193,16 @@ public class Wave {
     }
 
     public void spray() {
-        if (this.hitBlock) return;
+        if (this.hitBlock)
+            return;
 
         if (!drowningAway) {
             int sprayAmount = this.bigWave ? 3 : 1;
             float sprayIntensity;
             if (this.isWashingUp()) {
                 sprayIntensity = getWashingAge() / 128f;
-                if (washBounce()) sprayIntensity *= 2f;
+                if (washBounce())
+                    sprayIntensity *= 2f;
             } else {
                 sprayIntensity = (float) this.age / this.maxAge;
             }
@@ -205,13 +212,18 @@ public class Wave {
             double splashZ = this.z + this.velZ * 10;
 
             for (int i = 0; i < sprayAmount; i++) {
-            this.level.splash(false, splashX, this.y, splashZ, this.level.getRandom().nextGaussian() * 0.1f, Math.abs(this.level.getRandom().nextGaussian()) * 0.1f + 0.1f, this.level.getRandom().nextGaussian() * 0.1f);
+                this.level.splash(false, splashX, this.y, splashZ,
+                        this.level.getRandom().nextGaussian() * 0.1f,
+                        Math.abs(this.level.getRandom().nextGaussian()) * 0.1f + 0.1f,
+                        this.level.getRandom().nextGaussian() * 0.1f);
                 if (this.bigWave) {
-            this.level.splash(true, splashX + this.level.getRandom().nextGaussian() / 2f, this.y, splashZ + this.level.getRandom().nextGaussian() / 2f, 0, 0.01, 0);
+                    this.level.splash(true, splashX + this.level.getRandom().nextGaussian() / 2f, this.y,
+                            splashZ + this.level.getRandom().nextGaussian() / 2f, 0, 0.01, 0);
                 }
             }
 
-            this.level.spray(this.yaw, sprayIntensity, this.scale, splashX, this.y, splashZ, -this.velX, -this.velZ);
+            this.level.spray(this.yaw, sprayIntensity, this.scale, splashX, this.y, splashZ, -this.velX,
+                    -this.velZ);
 
             this.velX = 0;
             this.velY = 0;
@@ -236,7 +248,8 @@ public class Wave {
             }
         }
 
-        if(this.waterfallMode && this.aboveWater && !this.waterfallSplashed && WavifyWaveHandler.posIsWater(this.level, this.getBlockPos())) {
+        if (this.waterfallMode && this.aboveWater && !this.waterfallSplashed
+                && WavifyWaveHandler.posIsWater(this.level, this.getBlockPos())) {
             this.waterfallSplashed = true;
             int splashAmount = this.bigWave ? 7 : 3;
             float splashIntensity = this.bigWave ? 0.2f : 0.1f;
@@ -245,12 +258,11 @@ public class Wave {
 
             for (int i = 0; i < this.width; i++) {
                 for (int j = 0; j < splashAmount; j++) {
-            this.level.splash(false,
-                            splashX + this.level.getRandom().nextGaussian(),
-                            this.y,
+                    this.level.splash(false, splashX + this.level.getRandom().nextGaussian(), this.y,
                             splashZ + this.level.getRandom().nextGaussian(),
                             this.level.getRandom().nextGaussian() * splashIntensity,
-                            Math.abs(this.level.getRandom().nextGaussian()) * splashIntensity + splashIntensity,
+                            Math.abs(this.level.getRandom().nextGaussian()) * splashIntensity
+                                    + splashIntensity,
                             this.level.getRandom().nextGaussian() * splashIntensity);
                 }
             }
@@ -277,14 +289,15 @@ public class Wave {
     }
 
     public AxisAlignedBB getBoundingBox() {
-        return this.box.expand(0.5,0.5,0.5);
+        return this.box.expand(0.5, 0.5, 0.5);
     }
 
     public AxisAlignedBB getHitBox() {
         if (this.isWashingUp()) {
             float yawRadians = (float) Math.toRadians(this.yaw);
             float usedLength = this.bigWave ? this.length * 1.5f : this.length / 16f;
-            return this.getBoundingBox().addCoord(usedLength * Math.cos(yawRadians), 0, usedLength * Math.sin(yawRadians));
+            return this.getBoundingBox().addCoord(usedLength * Math.cos(yawRadians), 0,
+                    usedLength * Math.sin(yawRadians));
         }
         return this.getBoundingBox();
     }
@@ -295,7 +308,7 @@ public class Wave {
 
     public void updateWaterColor() {
         int color = this.level.waterColor(this.getBlockPos());
-        this.setColor((color >> 16 & 255)/255f, (color >> 8 & 255)/255f, (color & 255)/255f);
+        this.setColor((color >> 16 & 255) / 255f, (color >> 8 & 255) / 255f, (color & 255) / 255f);
     }
 
     public void setColor(float red, float green, float blue) {
@@ -331,7 +344,7 @@ public class Wave {
     public int getLight() {
 
         long dayTime = this.level.getDayTime();
-        if (canFullMoonGlow() && (int)(dayTime / 24000L % 8L) == 0 && dayTime % 24000L >= 12000)
+        if (canFullMoonGlow() && (int) (dayTime / 24000L % 8L) == 0 && dayTime % 24000L >= 12000)
             return 0xF000F0;
         return this.level.light(this.getBlockPos().above());
     }
@@ -378,7 +391,8 @@ public class Wave {
     protected void syncBoxToCurrentPosition() {
         float f = 0.2f / 2.0F;
         float g = 0.2f;
-        this.box = (AxisAlignedBB.getBoundingBox(x - (double) f, y, z - (double) f, x + (double) f, y + (double) g, z + (double) f)).expand(this.scale / 4f, 0, this.scale / 4f);
+        this.box = (AxisAlignedBB.getBoundingBox(x - (double) f, y, z - (double) f, x + (double) f,
+                y + (double) g, z + (double) f)).expand(this.scale / 4f, 0, this.scale / 4f);
     }
 
     public void markDead() {

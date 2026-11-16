@@ -30,7 +30,8 @@ public class RiverWave extends Wave {
     protected final float curvatureFactor;
     protected final float lateralFactor;
 
-    public RiverWave(WorldAccess world, BlockPos spawnWater, RiverFlowField field, double dirX, double dirZ, float travelBlocks) {
+    public RiverWave(WorldAccess world, BlockPos spawnWater, RiverFlowField field, double dirX, double dirZ,
+            float travelBlocks) {
         super(world, spawnWater.above(), (float) Math.toDegrees(Math.atan2(dirZ, dirX)), 0.4f, false);
         this.field = field;
         this.dirX = dirX;
@@ -39,7 +40,8 @@ public class RiverWave extends Wave {
 
         int rawWidth = RiverFlow.banksAt(world, this.x, this.z, this.waterY, dirX, dirZ, 5).width();
         int width = Mth.clamp(rawWidth, 3, 9);
-        if ((width & 1) == 0) width = Math.max(3, width - 1);
+        if ((width & 1) == 0)
+            width = Math.max(3, width - 1);
         this.setWidth(width);
 
         int depth = RiverFlow.depthAt(world, spawnWater, 4);
@@ -47,7 +49,7 @@ public class RiverWave extends Wave {
 
         float sizeJitter = 0.82f + world.getRandom().nextFloat() * 0.36f;
         this.scale = Math.max(1.7f, (1.55f + this.width * 0.24f) * sizeJitter);
-        this.scale *= (float)WavifyConfig.riverWaveScale;
+        this.scale *= (float) WavifyConfig.riverWaveScale;
         this.length = Math.max(1.05f, (1.0f + this.width * 0.11f) * sizeJitter);
         this.baseScale = this.scale;
         this.baseLength = this.length;
@@ -76,7 +78,8 @@ public class RiverWave extends Wave {
     @Override
     public int getRenderColumnCount() {
         int columns = Math.max(5, Math.round(this.width) + 2);
-        if ((columns & 1) == 0) columns++;
+        if ((columns & 1) == 0)
+            columns++;
         return Math.min(columns, 11);
     }
 
@@ -185,7 +188,7 @@ public class RiverWave extends Wave {
         float pulse = Mth.sin((this.age + this.motionPhase) * 0.18f);
         float crest = Math.abs(pulse);
         this.pitch = pulse * 2.4f;
-        this.scale = this.baseScale + crest * 0.05f * (float)WavifyConfig.riverWaveScale;
+        this.scale = this.baseScale + crest * 0.05f * (float) WavifyConfig.riverWaveScale;
         this.length = this.baseLength + crest * 0.08f;
 
         if (this.fading) {
@@ -197,7 +200,8 @@ public class RiverWave extends Wave {
     }
 
     protected float normalizedColumn(int columnIndex, int columnCount) {
-        if (columnCount <= 1) return 0f;
+        if (columnCount <= 1)
+            return 0f;
         float center = (columnCount - 1) * 0.5f;
         return (columnIndex - center) / center;
     }

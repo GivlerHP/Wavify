@@ -6,16 +6,19 @@ buildscript {
     }
     dependencies {
         classpath ('com.anatawa12.forge:ForgeGradle:1.2-1.1.+') { changing = true }
+        classpath 'com.diffplug.spotless:spotless-plugin-gradle:5.17.1'
     }
 }
 
 apply plugin: 'forge'
 apply plugin: 'idea'
+apply plugin: 'com.diffplug.spotless'
+apply from: 'gradle/formatting.gradle'
 
 project.sourceCompatibility = '1.8'
 project.targetCompatibility = '1.8'
 
-version = "1.2.1-backport.5"
+version = "1.2.1-backport.6"
 group = "net.superkat.wavify"
 archivesBaseName = "Wavify"
 
@@ -73,6 +76,13 @@ task verifyBackport(type: JavaExec, dependsOn: testClasses) {
     mainClass = 'net.superkat.wavify.renderer.BackportChecks'
 }
 check.dependsOn verifyBackport
+
+task verifyAngelicaOptions(type: JavaExec, dependsOn: testClasses) {
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'net.superkat.wavify.renderer.AngelicaOptionsChecks'
+    if (project.hasProperty('angelicaOptionsJar')) classpath += files(project.property('angelicaOptionsJar'))
+    else onlyIf { false }
+}
 
 // Optional native check on a workstation with LWJGL natives; never opens a visible window.
 task verifyRenderState(type: JavaExec, dependsOn: testClasses) {

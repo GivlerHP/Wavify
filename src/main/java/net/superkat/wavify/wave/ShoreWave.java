@@ -10,7 +10,7 @@ public final class ShoreWave extends Wave {
 
     public ShoreWave(WorldAccess world, BlockPos water, float yaw, boolean large, int width) {
         super(world, water.above(), yaw, .65f, large);
-        this.calmScale = this.scale * (float)WavifyConfig.shoreWaveScale;
+        this.calmScale = this.scale * (float) WavifyConfig.shoreWaveScale;
         this.scale = weatherScale();
         this.setWidth(width);
         syncBoxToCurrentPosition();
@@ -21,10 +21,12 @@ public final class ShoreWave extends Wave {
     }
 
     private float weatherScale() {
-        return calmScale * rainMultiplier(level.world.getRainStrength(1f), (float)WavifyConfig.rainWaveScale);
+        return calmScale
+                * rainMultiplier(level.world.getRainStrength(1f), (float) WavifyConfig.rainWaveScale);
     }
 
-    @Override public void tick() {
+    @Override
+    public void tick() {
         float target = weatherScale();
         if (Math.abs(target - scale) > .001f) {
             scale += (target - scale) * .05f;

@@ -1,0 +1,9 @@
+// Apply with `gradlew spotlessApply`; verify with `gradlew spotlessCheck`.
+spotless {
+    java {
+        target 'src/main/java/**/*.java', 'src/test/java/**/*.java'
+        eclipse('4.19.0').configFile('gradle/java-format.xml')
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}

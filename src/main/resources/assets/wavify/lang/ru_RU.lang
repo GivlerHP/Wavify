@@ -1,1 +1,8 @@
 wavify.name=Wavify
+wavify.options.enabled=Включить волны
+wavify.options.enabled.tooltip=Включает волны Wavify. При выключении останавливаются сканирование воды, обработка волн, частицы и звуки.
+wavify.options.mode=Волны
+wavify.options.mode.tooltip=Выберите, где появляются волны. При смене режима обработчик пересоздаётся, а ненужные волны и звуки очищаются.
+wavify.options.mode.seas=Только в морях
+wavify.options.mode.rivers=Только в реках
+wavify.options.mode.both=В морях и реках

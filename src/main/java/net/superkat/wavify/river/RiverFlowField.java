@@ -3,8 +3,6 @@ package net.superkat.wavify.river;
 
 import net.superkat.wavify.compat.*;
 
-
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +27,7 @@ public final class RiverFlowField {
 
     private static final int OCEAN_RIVER_RAY = 24;
     private static final int OCEAN_RIVER_CELL_BITS = 2;
-    private final java.util.Map<Long,Byte> oceanRiverCache = new java.util.HashMap<Long,Byte>();
+    private final java.util.Map<Long, Byte> oceanRiverCache = new java.util.HashMap<Long, Byte>();
 
     private int originX;
     private int originZ;
@@ -50,35 +48,36 @@ public final class RiverFlowField {
     public void ensureBuilt(Map<Long, Set<BlockPos>> riverWaters, double px, double pz, long tick) {
         int cx = Mth.floor(px);
         int cz = Mth.floor(pz);
-        if (built
-                && Math.abs(cx - builtCenterX) <= REBUILD_MOVE
-                && Math.abs(cz - builtCenterZ) <= REBUILD_MOVE
-                && tick - builtTick < REBUILD_INTERVAL) {
+        if (built && Math.abs(cx - builtCenterX) <= REBUILD_MOVE
+                && Math.abs(cz - builtCenterZ) <= REBUILD_MOVE && tick - builtTick < REBUILD_INTERVAL) {
             return;
         }
         build(riverWaters, cx, cz, tick);
     }
 
-    
     public RiverFlow.Flow flowAt(WorldAccess level, double x, int y, double z) {
         RiverFlow.Flow dyn = RiverFlow.dynamicFlowAt(level, x, y, z);
-        if (dyn != null) return dyn;
+        if (dyn != null)
+            return dyn;
         return flowAt(x, z);
     }
 
-    
     public RiverFlow.Flow flowAt(double x, double z) {
-        if (!built) return null;
+        if (!built)
+            return null;
         int lx = Mth.floor(x) - originX;
         int lz = Mth.floor(z) - originZ;
-        if (lx < 0 || lz < 0) return null;
+        if (lx < 0 || lz < 0)
+            return null;
         int gx = lx / CELL;
         int gz = lz / CELL;
-        if (gx >= gridW || gz >= gridH) return null;
+        if (gx >= gridW || gz >= gridH)
+            return null;
         int i = gz * gridW + gx;
         float dx = dirX[i];
         float dz = dirZ[i];
-        if (dx == 0f && dz == 0f) return null;
+        if (dx == 0f && dz == 0f)
+            return null;
         return new RiverFlow.Flow(dx, dz);
     }
 
@@ -86,7 +85,8 @@ public final class RiverFlowField {
         long key = (((long) (pos.getX() >> OCEAN_RIVER_CELL_BITS)) & 0xFFFFFFFFL)
                 | (((long) (pos.getZ() >> OCEAN_RIVER_CELL_BITS)) << 32);
         byte cached = this.oceanRiverCache.containsKey(key) ? this.oceanRiverCache.get(key) : 0;
-        if (cached != 0) return cached == 2;
+        if (cached != 0)
+            return cached == 2;
         boolean embedded = RiverFlow.isOceanSurrounded(level, pos, OCEAN_RIVER_RAY);
         this.oceanRiverCache.put(key, (byte) (embedded ? 2 : 1));
         return embedded;
@@ -116,12 +116,14 @@ public final class RiverFlowField {
             for (int cdz = -chunkRadius; cdz <= chunkRadius; cdz++) {
                 long key = WaterKey.chunk(playerChunkX + cdx, playerChunkZ + cdz);
                 Set<BlockPos> waters = riverWaters.get(key);
-                if (waters == null || waters.isEmpty()) continue;
+                if (waters == null || waters.isEmpty())
+                    continue;
 
                 for (BlockPos w : waters) {
                     int lx = w.getX() - this.originX;
                     int lz = w.getZ() - this.originZ;
-                    if (lx < 0 || lz < 0 || lx >= this.blockW || lz >= this.blockH) continue;
+                    if (lx < 0 || lz < 0 || lx >= this.blockW || lz >= this.blockH)
+                        continue;
                     this.water[lz * this.blockW + lx] = true;
                 }
             }
@@ -146,7 +148,8 @@ public final class RiverFlowField {
         List<List<Integer>> components = new ArrayList<>();
 
         for (int start = 0; start < n; start++) {
-            if (visited[start] || !cellWater[start]) continue;
+            if (visited[start] || !cellWater[start])
+                continue;
             List<Integer> component = gatherComponent(start, cellWater, visited);
             components.add(component);
             int seed = chooseSeed(component);
@@ -155,7 +158,8 @@ public final class RiverFlowField {
 
         computeGradient(cellWater, dist);
         if (hadPrev) {
-            reconcileOrientation(components, prevOriginX, prevOriginZ, prevGridW, prevGridH, prevDirX, prevDirZ);
+            reconcileOrientation(components, prevOriginX, prevOriginZ, prevGridW, prevGridH, prevDirX,
+                    prevDirZ);
         }
         fillGaps(cellWater);
         smoothOnce(cellWater);
@@ -178,12 +182,15 @@ public final class RiverFlowField {
             int iz = i / this.gridW;
             for (int ddx = -1; ddx <= 1; ddx++) {
                 for (int ddz = -1; ddz <= 1; ddz++) {
-                    if (ddx == 0 && ddz == 0) continue;
+                    if (ddx == 0 && ddz == 0)
+                        continue;
                     int nx = ix + ddx;
                     int nz = iz + ddz;
-                    if (nx < 0 || nz < 0 || nx >= this.gridW || nz >= this.gridH) continue;
+                    if (nx < 0 || nz < 0 || nx >= this.gridW || nz >= this.gridH)
+                        continue;
                     int ni = nz * this.gridW + nx;
-                    if (visited[ni] || !cellWater[ni]) continue;
+                    if (visited[ni] || !cellWater[ni])
+                        continue;
                     visited[ni] = true;
                     queue.add(ni);
                 }
@@ -254,19 +261,23 @@ public final class RiverFlowField {
 
         while (!pq.isEmpty()) {
             int i = pq.poll();
-            if (settled[i]) continue;
+            if (settled[i])
+                continue;
             settled[i] = true;
             int ix = i % this.gridW;
             int iz = i / this.gridW;
 
             for (int ddx = -1; ddx <= 1; ddx++) {
                 for (int ddz = -1; ddz <= 1; ddz++) {
-                    if (ddx == 0 && ddz == 0) continue;
+                    if (ddx == 0 && ddz == 0)
+                        continue;
                     int nx = ix + ddx;
                     int nz = iz + ddz;
-                    if (nx < 0 || nz < 0 || nx >= this.gridW || nz >= this.gridH) continue;
+                    if (nx < 0 || nz < 0 || nx >= this.gridW || nz >= this.gridH)
+                        continue;
                     int ni = nz * this.gridW + nx;
-                    if (!cellWater[ni] || settled[ni]) continue;
+                    if (!cellWater[ni] || settled[ni])
+                        continue;
                     double cost = (ddx != 0 && ddz != 0) ? SQRT2 : 1.0;
                     if (dist[i] + cost < dist[ni]) {
                         dist[ni] = dist[i] + cost;
@@ -281,7 +292,8 @@ public final class RiverFlowField {
         for (int iz = 0; iz < this.gridH; iz++) {
             for (int ix = 0; ix < this.gridW; ix++) {
                 int i = iz * this.gridW + ix;
-                if (!cellWater[i] || Double.isInfinite(dist[i])) continue;
+                if (!cellWater[i] || Double.isInfinite(dist[i]))
+                    continue;
 
                 double ddx = axisDerivative(ix, iz, 1, 0, cellWater, dist);
                 double ddz = axisDerivative(ix, iz, 0, 1, cellWater, dist);
@@ -294,16 +306,17 @@ public final class RiverFlowField {
         }
     }
 
-    private void reconcileOrientation(List<List<Integer>> components,
-                                      int prevOriginX, int prevOriginZ, int prevGridW, int prevGridH,
-                                      float[] prevDirX, float[] prevDirZ) {
-        if (prevDirX.length == 0) return;
+    private void reconcileOrientation(List<List<Integer>> components, int prevOriginX, int prevOriginZ,
+            int prevGridW, int prevGridH, float[] prevDirX, float[] prevDirZ) {
+        if (prevDirX.length == 0)
+            return;
 
         for (List<Integer> component : components) {
             double dot = 0;
             int overlap = 0;
             for (int i : component) {
-                if (isInvalid(i)) continue;
+                if (isInvalid(i))
+                    continue;
                 int gx = i % this.gridW;
                 int gz = i / this.gridW;
                 int worldX = this.originX + gx * CELL + CELL / 2;
@@ -311,12 +324,15 @@ public final class RiverFlowField {
 
                 int plx = worldX - prevOriginX;
                 int plz = worldZ - prevOriginZ;
-                if (plx < 0 || plz < 0) continue;
+                if (plx < 0 || plz < 0)
+                    continue;
                 int pgx = plx / CELL;
                 int pgz = plz / CELL;
-                if (pgx >= prevGridW || pgz >= prevGridH) continue;
+                if (pgx >= prevGridW || pgz >= prevGridH)
+                    continue;
                 int pi = pgz * prevGridW + pgx;
-                if (prevDirX[pi] == 0f && prevDirZ[pi] == 0f) continue;
+                if (prevDirX[pi] == 0f && prevDirZ[pi] == 0f)
+                    continue;
 
                 dot += this.dirX[i] * prevDirX[pi] + this.dirZ[i] * prevDirZ[pi];
                 overlap++;
@@ -337,14 +353,18 @@ public final class RiverFlowField {
         boolean hasPlus = plus >= 0 && cellWater[plus] && !Double.isInfinite(dist[plus]);
         boolean hasMinus = minus >= 0 && cellWater[minus] && !Double.isInfinite(dist[minus]);
         int self = iz * this.gridW + ix;
-        if (hasPlus && hasMinus) return (dist[plus] - dist[minus]) / 2.0;
-        if (hasPlus) return dist[plus] - dist[self];
-        if (hasMinus) return dist[self] - dist[minus];
+        if (hasPlus && hasMinus)
+            return (dist[plus] - dist[minus]) / 2.0;
+        if (hasPlus)
+            return dist[plus] - dist[self];
+        if (hasMinus)
+            return dist[self] - dist[minus];
         return 0;
     }
 
     private int neighbor(int gx, int gz) {
-        if (gx < 0 || gz < 0 || gx >= this.gridW || gz >= this.gridH) return -1;
+        if (gx < 0 || gz < 0 || gx >= this.gridW || gz >= this.gridH)
+            return -1;
         return gz * this.gridW + gx;
     }
 
@@ -353,14 +373,17 @@ public final class RiverFlowField {
             for (int iz = 0; iz < this.gridH; iz++) {
                 for (int ix = 0; ix < this.gridW; ix++) {
                     int i = iz * this.gridW + ix;
-                    if (!cellWater[i] || !isInvalid(i)) continue;
+                    if (!cellWater[i] || !isInvalid(i))
+                        continue;
                     double sx = 0;
                     double sz = 0;
                     for (int ddx = -1; ddx <= 1; ddx++) {
                         for (int ddz = -1; ddz <= 1; ddz++) {
-                            if (ddx == 0 && ddz == 0) continue;
+                            if (ddx == 0 && ddz == 0)
+                                continue;
                             int ni = neighbor(ix + ddx, iz + ddz);
-                            if (ni < 0 || isInvalid(ni)) continue;
+                            if (ni < 0 || isInvalid(ni))
+                                continue;
                             sx += this.dirX[ni];
                             sz += this.dirZ[ni];
                         }
@@ -383,15 +406,18 @@ public final class RiverFlowField {
         for (int iz = 0; iz < this.gridH; iz++) {
             for (int ix = 0; ix < this.gridW; ix++) {
                 int i = iz * this.gridW + ix;
-                if (isInvalid(i)) continue;
+                if (isInvalid(i))
+                    continue;
 
                 double sx = this.dirX[i];
                 double sz = this.dirZ[i];
                 for (int ddx = -1; ddx <= 1; ddx++) {
                     for (int ddz = -1; ddz <= 1; ddz++) {
-                        if (ddx == 0 && ddz == 0) continue;
+                        if (ddx == 0 && ddz == 0)
+                            continue;
                         int ni = neighbor(ix + ddx, iz + ddz);
-                        if (ni < 0 || isInvalid(ni)) continue;
+                        if (ni < 0 || isInvalid(ni))
+                            continue;
                         sx += this.dirX[ni];
                         sz += this.dirZ[ni];
                     }
@@ -416,7 +442,8 @@ public final class RiverFlowField {
     }
 
     private boolean waterLocal(int bx, int bz) {
-        if (bx < 0 || bz < 0 || bx >= this.blockW || bz >= this.blockH) return false;
+        if (bx < 0 || bz < 0 || bx >= this.blockW || bz >= this.blockH)
+            return false;
         return this.water[bz * this.blockW + bx];
     }
 
@@ -425,7 +452,8 @@ public final class RiverFlowField {
         int baseZ = gz * CELL;
         for (int dx = 0; dx < CELL; dx++) {
             for (int dz = 0; dz < CELL; dz++) {
-                if (waterLocal(baseX + dx, baseZ + dz)) return true;
+                if (waterLocal(baseX + dx, baseZ + dz))
+                    return true;
             }
         }
         return false;
