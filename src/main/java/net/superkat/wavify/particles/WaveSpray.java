@@ -26,7 +26,7 @@ public final class WaveSpray extends EntityFX {
         motionZ = Math.sin(Math.toRadians(yaw)) * speed;
         motionY = .15 * intensity;
         particleMaxAge = (int) (50 + intensity * 5);
-        size = Mth.clamp(intensity * 4, 1, scale * 2);
+        size = Mth.clamp(intensity * 4, 1, white ? scale * 2 : Mth.clamp(intensity * 4, 1, scale * 2) * 2);
         noClip = false;
         setSize(.2f, .2f);
         if (!white) {
@@ -65,28 +65,30 @@ public final class WaveSpray extends EntityFX {
         posY = boundingBox.minY;
         posZ = (boundingBox.minZ + boundingBox.maxZ) * .5;
         onGround = oldY != move.yCoord && oldY < 0;
-        if (onGround) {
-            motionY = 0;
-            motionX *= .7;
-            motionZ *= .7;
-        } else {
-            motionX *= .98;
-            motionZ *= .98;
-        }
-        roll = onGround ? roll * .7f : roll + (float) motionY * 35;
+        // TextureSheetParticle applies friction without the extra ground damping of EntityFX.
+        motionX *= .98;
+        motionY *= .98;
+        motionZ *= .98;
         if (level.water(BlockPos.containing(posX, posY + 1, posZ))) {
-            if (type == 1)
-                for (int i = 0; i < 5; i++)
-                    level.splash(false, posX + rand.nextGaussian(), posY + 1, posZ + rand.nextGaussian(),
-                            rand.nextGaussian() * .05, .1 + intensity, rand.nextGaussian() * .05);
+            posX -= motionX * 8;
+            posZ -= motionZ * 8;
+            for (int i = 0; i < 5; i++) {
+                level.splash(false, posX + rand.nextGaussian(), posY + 1, posZ + rand.nextGaussian(),
+                        rand.nextGaussian() * .05,
+                        Math.abs(rand.nextGaussian()) * .1 + Mth.clamp(intensity, .1f, .3f),
+                        rand.nextGaussian() * .05);
+                level.world.spawnParticle("bubble", posX + rand.nextGaussian() / 2, posY + 1,
+                        posZ + rand.nextGaussian() / 2, rand.nextGaussian() / 8, 0, rand.nextGaussian() / 8);
+            }
             setDead();
         }
+        roll = motionY != 0 && !onGround ? roll + (float) motionY * 35 : roll * .7f;
     }
 
     @Override
     public void renderParticle(Tessellator t, float partial, float rx, float rz, float ryz, float rxy,
             float rxz) {
-        IIcon sprite = SPRITES[type][Math.min(19, particleAge * 20 / particleMaxAge)];
+        IIcon sprite = SPRITES[type][Math.min(19, particleAge * 19 / particleMaxAge)];
         if (sprite == null)
             return;
         double x = prevPosX + (posX - prevPosX) * partial - interpPosX,

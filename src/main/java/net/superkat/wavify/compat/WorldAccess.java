@@ -139,7 +139,7 @@ public final class WorldAccess {
             return;
         mc.effectRenderer.addEffect(new net.superkat.wavify.particles.WaveSpray(this, x, y - .05, z, vx, vz,
                 yaw - 180, intensity, scale, false));
-        mc.effectRenderer.addEffect(new net.superkat.wavify.particles.WaveSpray(this, x, y - .04, z, vx, vz,
+        mc.effectRenderer.addEffect(new net.superkat.wavify.particles.WaveSpray(this, x, y - .05, z, vx, vz,
                 yaw - 180, intensity, scale, true));
     }
     public static final class State {
